@@ -1,14 +1,76 @@
-# ftps
 REPOSITORIO GITHUB
-https://github.com/clockworkcomputer/ftptls.git
-
-DESCARGAR REPOSITORIO GITHUB
-git clone https://github.com/clockworkcomputer/ftptls.git
+https://github.com/clockworkcomputer/ftps.git
 
 CREAR DIRECTORIO FTP 
 mkdir contenedores && cd contenedores
-mkdir ftptls && cd ftptls
+
+DESCARGAR REPOSITORIO GITHUB
+git clone https://github.com/clockworkcomputer/ftps.git
+cd ftps
 nano docker-compose.yml
 
-CREAR DIRECTORIO CONTENIDO FTP
-mkdir /home/clockworker/ftp
+EN CASO DE NO DESCARGAR REPOSITORIO
+mkdir ftps && cd ftps
+nano docker-compose.yml
+
+INICIAR CONTENEDOR
+docker-compose up -d
+
+COMPROBAR ACCESO DESDE FILEZILLA
+
+CREAR CERTIFICADO
+sudo su
+mkdir -p /etc/ssl/private
+openssl dhparam -out /etc/ssl/private/pure-ftpd-dhparams.pem 2048
+openssl req -x509 -nodes -newkey rsa:2048 -sha256 -keyout \
+    /etc/ssl/private/pure-ftpd.pem \
+    -out /etc/ssl/private/pure-ftpd.pem
+chmod 600 /etc/ssl/private/*.pem
+
+MODIFICAR docker-compose.yml PARA UTILIZAR TLS
+DETENEMOS E INICIAMOS CONTENEDOR
+docker-compose down
+docker-compose up -d
+
+CONEXIÓN DESDE UBUNTU DESKTOP
+ftp 192.168.30.3
+
+RESOLUCIÓN NOMBRE DE DOMINIO
+CASO 1 SIN SERVIDOR DNS - ARCHIVO HOSTS
+sudo nano /etc/hosts 
+192.168.30.3 ftps.docker.local
+
+CASO 2. BIND9
+AÑADIR ZONA NUEVA docker.local
+AÑADIR HOST ftps.docker.local IN A 192.168.30.3 
+sudo systemctl restart bind9
+
+CASO 3. SAMBA INTERNAL DNS
+sudo samba-tool user setpassword administrator
+samba-tool dns zonecreate dc docker.local -U administrator
+samba-tool dns add dc docker.local ftps A 192.168.30.3 -U administrator
+
+SOLUCIÓN RESOLV.CONF > 18.04
+ls -l /etc/resolv.conf
+sudo rm -f /etc/resolv.conf
+sudo ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+ls -l /etc/resolv.conf
+
+CONEXIÓN UBICACIÓN DE RED
+ftps://ftps.docker.local
+
+ADMINISTRACÓN DE DOCKER
+LISTAR CONTENEDORES EN EJECUCIÓN
+sudo docker ps
+
+LISTAR CONTENEDORES ACTIVOS E INACTIVOS
+sudo docker ps -a
+
+DETENER TODOS LOS CONTENEDORES
+docker stop $(docker ps -a -q)
+
+ELIMINAR TODOS LOS CONTENEDORES
+docker rm $(docker ps -a -q)
+
+ELIMINAR TODAS LAS IMÁGENES
+docker rmi $(docker images -q)
