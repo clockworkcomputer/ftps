@@ -1,0 +1,18 @@
+services:
+  ftpd_server:
+    image: stilliard/pure-ftpd
+    container_name: pure-ftpd
+    ports:
+      - "21:21"
+      - "30000-30009:30000-30009"
+    volumes: #Recuerda reemplazar /folder_on_disk/ con la ruta donde deseas almacenar los archivos en la máquina anfitriona.
+      - "/folder_on_disk/data:/home/username/"
+      - "/folder_on_disk/passwd:/etc/pure-ftpd/passwd"
+# Descomenta para emplear SSL/TLS
+#      - "/folder_on_disk/ssl:/etc/ssl/private/"
+    environment:
+      FTP_USER_NAME: username
+      FTP_USER_PASS: mypass
+      FTP_USER_HOME: /home/username
+
+    restart: always
