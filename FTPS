@@ -1,0 +1,14 @@
+# ftps
+REPOSITORIO GITHUB
+https://github.com/clockworkcomputer/ftptls.git
+
+DESCARGAR REPOSITORIO GITHUB
+git clone https://github.com/clockworkcomputer/ftptls.git
+
+CREAR DIRECTORIO FTP 
+mkdir contenedores && cd contenedores
+mkdir ftptls && cd ftptls
+nano docker-compose.yml
+
+CREAR DIRECTORIO CONTENIDO FTP
+mkdir /home/clockworker/ftp
